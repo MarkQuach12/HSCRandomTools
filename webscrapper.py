@@ -3,32 +3,30 @@ import requests
 import matplotlib.pyplot as plt
 import numpy as np
 
-class subjects:
-    def __init__(self, name, include2019, link, rawMarks, alignedMarks, polynomial):
+class Subject:
+    def __init__(self, name, include_2019, link, raw_marks, aligned_marks, polynomial):
         self.name = name
-        self.include2019 = include2019
+        self.include_2019 = include_2019
         self.link = link
-        self.rawMarks = rawMarks
-        self.alignedMarks = alignedMarks
+        self.raw_marks = raw_marks
+        self.aligned_marks = aligned_marks
         self.polynomial = polynomial
 
     def __repr__ (self):
         return f"Subject(name={self.name}, link={self.link})"
 
-subjectsList = []
+subjects_list = []
 
-departmentList = ['english', 'mathematics' ,'science', 'technologies', 'hsie', 'creative-arts', 'pdhpe']
+department_list = ['english', 'mathematics', 'science', 'technologies', 'hsie', 'creative-arts', 'pdhpe']
 
-indexPage = requests.get("https://rawmarks.info/")
-soup = BeautifulSoup(indexPage.text, "html.parser")
+index_page = requests.get("https://rawmarks.info/")
+soup = BeautifulSoup(index_page.text, "html.parser")
 for link in soup.findAll("a"):
     address = link.get("href")
 
-    isSubject = False
-
-    for subject in departmentList:
+    for subject in department_list:
         if subject in address and address.count('/') > 4:
-            subjectsList.append(subjects('', False, address, [], [], ''))
+            subjects_list.append(Subject('', False, address, [], [], ''))
             break
     continue
 
@@ -47,123 +45,121 @@ def is_monotonically_increasing(polynomial, x_values):
 
     return np.all(derivative_values >= 0)
 
-def gettingInformation(subject):
-    # Scrapping
+def get_information(subject):
+    # Scraping
     page_to_scrape = requests.get(subject.link).text
     soup = BeautifulSoup(page_to_scrape, "html.parser")
     name = soup.find('h1').text
     print(name)
-    years = soup.findAll("td", attrs = {"class": "column-1"})
-    rawMarks = soup.findAll("td", attrs = {"class": "column-2"})
-    alignedMarks = soup.findAll("td", attrs = {"class": "column-3"})
+    years = soup.findAll("td", attrs={"class": "column-1"})
+    raw_marks = soup.findAll("td", attrs={"class": "column-2"})
+    aligned_marks = soup.findAll("td", attrs={"class": "column-3"})
 
-    yearBoundary = 0
+    year_boundary = 0
 
-    rawMarksArray = []
-    alignedMarksArray = []
+    raw_marks_array = []
+    aligned_marks_array = []
 
-    if subject.include2019:
-        yearBoundary = 2019
+    if subject.include_2019:
+        year_boundary = 2019
     else:
-        yearBoundary = 2020
+        year_boundary = 2020
 
-    for year, rawMark, alignedMark in zip(years, rawMarks, alignedMarks):
-        if int(year.text) >= yearBoundary:
-            # print(year.text + " - " + rawMark.text + " - " + alignedMark.text)
-            rawMarksArray.append(float(rawMark.text))
-            alignedMarksArray.append(float(alignedMark.text))
+    for year, raw_mark, aligned_mark in zip(years, raw_marks, aligned_marks):
+        if int(year.text) >= year_boundary:
+            raw_marks_array.append(float(raw_mark.text))
+            aligned_marks_array.append(float(aligned_mark.text))
 
     subject.name = name
-    subject.rawMarks = rawMarksArray
-    subject.alignedMarks = alignedMarksArray
+    subject.raw_marks = raw_marks_array
+    subject.aligned_marks = aligned_marks_array
 
-    minBic = float('inf')
-    bestPolynomial = None
-    bestDegree = 0
+    min_bic = float('inf')
+    best_polynomial = None
+    best_degree = 0
 
-    if len(rawMarksArray) < 10:
+    if len(raw_marks_array) < 10:
         return
 
     # Building Regression with Bayesian Information Criterion
     for degree in range(1, 6):
-        if len(rawMarksArray) >= degree + 1:
-            coefficients = np.polyfit(rawMarksArray, alignedMarksArray, degree)
+        if len(raw_marks_array) >= degree + 1:
+            coefficients = np.polyfit(raw_marks_array, aligned_marks_array, degree)
             polynomial = np.poly1d(coefficients)
 
-            if not is_monotonically_increasing(polynomial, rawMarksArray):
+            if not is_monotonically_increasing(polynomial, raw_marks_array):
                 print(f"Degree {degree} polynomial for {subject.name} is not monotonically increasing.")
                 continue
 
-            y_pred = polynomial(rawMarksArray)
+            y_pred = polynomial(raw_marks_array)
 
-            bic = calculate_bic(np.array(alignedMarksArray), y_pred, degree + 1)
+            bic = calculate_bic(np.array(aligned_marks_array), y_pred, degree + 1)
 
-            if bic < minBic:
-                minBic = bic
-                bestPolynomial = polynomial
-                bestDegree = degree
+            if bic < min_bic:
+                min_bic = bic
+                best_polynomial = polynomial
+                best_degree = degree
 
-    subject.polynomial = bestPolynomial
-    print(f"Selected polynomial degree {bestDegree} for {subject.name} with BIC: {minBic}")
+    subject.polynomial = best_polynomial
+    print(f"Selected polynomial degree {best_degree} for {subject.name} with BIC: {min_bic}")
 
+for subject in subjects_list:
+    get_information(subject)
 
-for subject in subjectsList:
-    gettingInformation(subject)
+def clean_up():
+    for subject in subjects_list[:]:
+        if len(subject.raw_marks) < 10:
+            subjects_list.remove(subject)
 
-def cleanUp():
-    for subject in subjectsList[:]:
-        if len(subject.rawMarks) < 10:
-            subjectsList.remove(subject)
+clean_up()
 
-cleanUp()
-
-def findSubject(subjectName):
-    for subject in subjectsList:
-        if subject.name == subjectName:
+def find_subject(subject_name):
+    for subject in subjects_list:
+        if subject.name == subject_name:
             return subject
 
-def predictMarks(subjectName):
-        subject = findSubject(subjectName)
-        print("Enter Predicted Raw Marks")
-        x = input()
+def predict_marks(subject_name):
+    subject = find_subject(subject_name)
+    print("Enter Predicted Raw Marks")
+    x = input()
 
-        if 0 < float(x) and float(x) > 100:
-            print("Pick a real mark lol")
-            return
+    if 0 < float(x) and float(x) > 100:
+        print("Pick a real mark lol")
+        return
 
-        newResult = subject.polynomial(float(x))
+    new_result = subject.polynomial(float(x))
 
-        band = ""
+    band = ""
 
-        if newResult >= 90:
-            band = "Band 6"
-        elif newResult >= 80:
-            band = "Band 5"
-        elif newResult >= 70:
-            band = "Band 4"
-        elif newResult >= 60:
-            band = "Band 3"
-        elif newResult >= 50:
-            band = "Band 2"
-        else:
-            band = "Band 1"
+    if new_result >= 90:
+        band = "Band 6"
+    elif new_result >= 80:
+        band = "Band 5"
+    elif new_result >= 70:
+        band = "Band 4"
+    elif new_result >= 60:
+        band = "Band 3"
+    elif new_result >= 50:
+        band = "Band 2"
+    else:
+        band = "Band 1"
 
-        print("Your predicted HSC Mark for " + subjectName + " is " + str(round(newResult, 2)) + " which is a " + band)
-        getPlot(subject)
+    print(f"Your predicted HSC Mark for {subject_name} is {str(round(new_result, 2))}, which is a {band}")
+    get_plot(subject)
 
-def getPlot(subject):
-    x_values = np.linspace(min(subject.rawMarks), max(subject.rawMarks), 100)
+def get_plot(subject):
+    x_values = np.linspace(min(subject.raw_marks), max(subject.raw_marks), 100)
     y_values = subject.polynomial(x_values)
     plt.plot(x_values, y_values, label="Regression Line")
-    plt.plot(subject.rawMarks, subject.alignedMarks, "o", label="Data points")
-    plt.title("Raw Marks vs Aligned Marks for " + subject.name)
+    plt.plot(subject.raw_marks, subject.aligned_marks, "o", label="Data points")
+    plt.title(f"Raw Marks vs Aligned Marks for {subject.name}")
     plt.xlabel("Raw Marks")
     plt.ylabel("Aligned Marks")
     plt.show()
 
-def shallowPrint():
+def shallow_print():
     print("----------UPDATED LIST OF ITEMS----------")
-    for subject in subjectsList:
-        getPlot(subject)
+    for subject in subjects_list:
+        get_plot(subject)
 
-shallowPrint()
+shallow_print()
