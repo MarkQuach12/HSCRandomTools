@@ -32,9 +32,20 @@ for link in soup.findAll("a"):
             break
     continue
 
-# print(subjectsList)
-# for subject in subjectsList:
-#     page_to_scrape = requests.get("https://rawmarks.info/mathematics/" + subject.name + "/")
+def calculate_bic(y, y_pred, p):
+    """
+    Calculate BIC using the residual sum of squares method.
+    """
+    n = len(y)
+    residual_sum_of_squares = np.sum((y - y_pred) ** 2)
+    bic_score = n * np.log(residual_sum_of_squares / n) + p * np.log(n)
+    return bic_score
+
+def is_monotonically_increasing(polynomial, x_values):
+    derivative = np.polyder(polynomial)
+    derivative_values = derivative(x_values)
+
+    return np.all(derivative_values >= 0)
 
 def gettingInformation(subject):
     # Scrapping
@@ -62,16 +73,39 @@ def gettingInformation(subject):
             rawMarksArray.append(float(rawMark.text))
             alignedMarksArray.append(float(alignedMark.text))
 
-    # Building Regression
-    if len(rawMarksArray) >= 10:
-        coefficients = np.polyfit(rawMarksArray, alignedMarksArray, 3)
-        polynomial = np.poly1d(coefficients)
-        subject.polynomial = polynomial
     subject.name = name
     subject.rawMarks = rawMarksArray
     subject.alignedMarks = alignedMarksArray
 
-    # print(len(subject.polynomial))
+    minBic = float('inf')
+    bestPolynomial = None
+    bestDegree = 0
+
+    if len(rawMarksArray) < 10:
+        return
+
+    # Building Regression with Bayesian Information Criterion
+    for degree in range(1, 6):
+        if len(rawMarksArray) >= degree + 1:
+            coefficients = np.polyfit(rawMarksArray, alignedMarksArray, degree)
+            polynomial = np.poly1d(coefficients)
+
+            if not is_monotonically_increasing(polynomial, rawMarksArray):
+                print(f"Degree {degree} polynomial for {subject.name} is not monotonically increasing.")
+                continue
+
+            y_pred = polynomial(rawMarksArray)
+
+            bic = calculate_bic(np.array(alignedMarksArray), y_pred, degree + 1)
+
+            if bic < minBic:
+                minBic = bic
+                bestPolynomial = polynomial
+                bestDegree = degree
+
+    subject.polynomial = bestPolynomial
+    print(f"Selected polynomial degree {bestDegree} for {subject.name} with BIC: {minBic}")
+
 
 for subject in subjectsList:
     gettingInformation(subject)
@@ -82,14 +116,6 @@ def cleanUp():
             subjectsList.remove(subject)
 
 cleanUp()
-
-def shallowPrint():
-    for subject in subjectsList[:]:
-        print(subject.name)
-
-shallowPrint()
-
-# print(subjectsList)
 
 def findSubject(subjectName):
     for subject in subjectsList:
@@ -134,3 +160,10 @@ def getPlot(subject):
     plt.xlabel("Raw Marks")
     plt.ylabel("Aligned Marks")
     plt.show()
+
+def shallowPrint():
+    print("----------UPDATED LIST OF ITEMS----------")
+    for subject in subjectsList:
+        getPlot(subject)
+
+shallowPrint()
