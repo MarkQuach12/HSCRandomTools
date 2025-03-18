@@ -8,8 +8,14 @@ class Subject:
     def __init__(self, name='', link='', raw_marks=None, aligned_marks=None, polynomial=None):
         self.name = name
         self.link = link
-        self.raw_marks = raw_marks if raw_marks is not None else []
-        self.aligned_marks = aligned_marks if aligned_marks is not None else []
+        self.years = {}
+
+    def add_year_data(self, year, raw_mark, aligned_mark):
+        if year not in self.years:
+            self.years[year] = {"raw_marks": [], "aligned_marks": []}
+
+        self.years[year]["raw_marks"].append(raw_mark)
+        self.years[year]["aligned_marks"].append(aligned_mark)
 
     def __repr__(self):
         return f"Subject(name={self.name}, link={self.link})"
@@ -36,25 +42,28 @@ def get_information(subject):
     raw_marks = [float(mark.text) for mark in soup.find_all("td", class_="column-2")]
     aligned_marks = [float(mark.text) for mark in soup.find_all("td", class_="column-3")]
 
-    subject.raw_marks = [raw for year, raw in zip(years, raw_marks) if year >= 2020]
-    subject.aligned_marks = [aligned for year, aligned in zip(years, aligned_marks) if year >= 2020]
+    for information in zip(years, raw_marks, aligned_marks):
+        if information[0] >= 2019:
+            subject.add_year_data(information[0], information[1], information[2])
 
-    if len(subject.raw_marks) < 10:
-        return
 
-def clean_up(subjects):
-    return [subject for subject in subjects if len(subject.raw_marks) >= 10]
+def dictionaryConversion(subjects):
+    return {
+        subject.name: {
+            year: {
+                "raw_marks": data["raw_marks"],
+                "aligned_marks": data["aligned_marks"]
+            }
+            for year, data in subject.years.items()
+        }
+        for subject in subjects
+    }
 
-def dictionaryConversion(subjects, default_value=None):
-    return {subject.name:
-            {"raw_marks": subject.raw_marks,
-             "aligned_marks": subject.aligned_marks} for subject in subjects}
 
 def main():
     subjects_list = fetch_subject_links()
     for subject in subjects_list:
         get_information(subject)
-    subjects_list = clean_up(subjects_list)
     subjects_list = dictionaryConversion(subjects_list)
 
     current_directory = os.path.dirname(__file__)
