@@ -13,8 +13,10 @@ def main():
         subjects = json.load(file).items()
 
     for subject in subjects:
-        polynomial = polynomials(subject[1])
-        subject[1]["polynomial"] = polynomial
+        for year, marks in subject[1].items():
+            if len(marks["raw_marks"]) >= 5:
+                polynomial = polynomials(marks)
+                marks["polynomial"] = polynomial
 
     subjectName = input("What subject are your curious about?\n")
     subjectInQuestion = findSubject(subjectName, subjects)
@@ -65,10 +67,20 @@ def predict_marks(subject):
     if raw_mark is None:
         return
 
-    predicted_mark = subject[1]["polynomial"](raw_mark)
-    band = determine_band(predicted_mark)
+    print(f"\nPredicted Marks for {subject[0]}:")
 
-    print(f"Your predicted HSC Mark for {subject[0]} is {round(predicted_mark, 2)}, which is a {band}")
+    for year, marks in subject[1].items():
+        if "polynomial" in marks and marks["polynomial"] is not None:
+            predicted_mark = marks["polynomial"](raw_mark)
+            band = determine_band(predicted_mark)
+
+            print(f"Year {year}: Predicted Aligned Mark = {round(predicted_mark, 2)}, {band}")
+
+
+    # predicted_mark = subject[1]["polynomial"](raw_mark)
+    # band = determine_band(predicted_mark)
+
+    # print(f"Your predicted HSC Mark for {subject[0]} is {round(predicted_mark, 2)}, which is a {band}")
     # plot_subject(subject)
 
 def get_valid_raw_mark():
