@@ -38,7 +38,7 @@ function App() {
           value='rawMark'
           onchange={(e) => setRawMark(e.target.value)}
         />
-        <Button className='w-full mt-4' variant="outline">Button</Button>
+        <Button className='w-full mt-4' variant="outline">Predict Scaled Mark</Button>
         </CardContent>
         </Card>
       </div>
