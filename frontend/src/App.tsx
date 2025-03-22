@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
+
 function App() {
   const [subject, setSubject] = useState("")
   const [rawMark, setRawMark] = useState("")
@@ -35,8 +36,10 @@ function App() {
           type='number'
           placeholder='Enter Raw Mark'
           className='mt-2'
-          value='rawMark'
-          onchange={(e) => setRawMark(e.target.value)}
+          value={rawMark}
+          onChange={(e) => setRawMark(e.target.value)}
+          min={0}
+          max={100}
         />
         <Button className='w-full mt-4' variant="outline">Predict Scaled Mark</Button>
         </CardContent>

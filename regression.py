@@ -2,33 +2,26 @@ import matplotlib.pyplot as plt
 import numpy as np
 import json
 import os
+from flask import Flask, request, jsonify
 
+app = Flask(__name__)
 
-def main():
-    current_directory = os.path.dirname(__file__)
-    data_directory = os.path.join(current_directory, 'data')
-    file_path = os.path.join(data_directory, 'raw_marks.json')
+current_directory = os.path.dirname(__file__)
+data_directory = os.path.join(current_directory, 'data')
+file_path = os.path.join(data_directory, 'raw_marks.json')
 
-    with open(file_path, 'r') as file:
-        subjects = json.load(file).items()
+with open(file_path, 'r') as file:
+    subjects = json.load(file)
 
-    for subject in subjects:
-        for year, marks in subject[1].items():
-            if len(marks["raw_marks"]) >= 5:
-                polynomial = polynomials(marks)
-                marks["polynomial"] = polynomial
+def is_monotonically_increasing(polynomial, x_values):
+    derivative = np.polyder(polynomial)
+    derivative_values = derivative(x_values)
+    return np.all(derivative_values >= 0)
 
-    subjectName = input("What subject are your curious about?\n")
-    subjectInQuestion = findSubject(subjectName, subjects)
-    predict_marks(subjectInQuestion)
-
-
-def findSubject(name, subjects):
-    for subject in subjects:
-        if name == subject[0]:
-            return subject
-
-    return None
+def calculate_bic(y, y_pred, p):
+    n = len(y)
+    residual_sum_of_squares = np.sum((y - y_pred) ** 2)
+    return n * np.log(residual_sum_of_squares / n) + p * np.log(n)
 
 def polynomials(subject):
     min_bic = float('inf')
@@ -51,15 +44,17 @@ def polynomials(subject):
 
     return best_polynomial
 
-def calculate_bic(y, y_pred, p):
-    n = len(y)
-    residual_sum_of_squares = np.sum((y - y_pred) ** 2)
-    return n * np.log(residual_sum_of_squares / n) + p * np.log(n)
+for subject_name, years_data in subjects.items():
+    for year, marks in years_data.items():
+        if len(marks["raw_marks"]) >= 5:
+            polynomial = polynomials(marks)
+            marks["polynomial"] = polynomial
 
-def is_monotonically_increasing(polynomial, x_values):
-    derivative = np.polyder(polynomial)
-    derivative_values = derivative(x_values)
-    return np.all(derivative_values >= 0)
+def main():
+    subjectName = input("What subject are your curious about?\n")
+    subjectInQuestion = subjects.get(subjectName)
+    predict_marks(subjectInQuestion)
+
 
 def predict_marks(subject):
     raw_mark = get_valid_raw_mark()
@@ -108,16 +103,39 @@ def determine_band(mark):
     else:
         return "Band 1"
 
-def plot_subject(subject):
-    x_values = np.linspace(min(subject[1]["raw_marks"]), max(subject[1]["raw_marks"]), 100)
-    y_values = subject[1]["polynomial"](x_values)
-    plt.plot(x_values, y_values, label="Regression Line")
-    plt.plot(subject[1]["raw_marks"], subject[1]["aligned_marks"], "o", label="Data points")
-    plt.title(f"Raw Marks vs Aligned Marks for {subject[0]}")
-    plt.xlabel("Raw Marks")
-    plt.ylabel("Aligned Marks")
-    plt.legend()
-    plt.show()
+@app.route('/predict', methods=['GET'])
+def predict():
+    subject_name = request.args.get('subject')
+    raw_mark = request.args.get('raw_mark', type=float)
+
+    if not subject_name or raw_mark is None:
+        return jsonify({'error': 'Missing subject name or raw mark'}), 400
+
+    subject = subjects.get(subject_name)
+
+    print(subject)
+    if not subject:
+        return jsonify({'error': 'Subject not found'}), 404
+
+    predictions = []
+
+    for years, marks in subject.items():
+        if "polynomial" in marks and marks["polynomial"] is not None:
+            predicted_mark = marks["polynomial"](raw_mark)
+            predictions.append({'year': years, 'predicted_mark': round(predicted_mark, 2)})
+
+    return jsonify({'predictions': predictions})
+
+# def plot_subject(subject):
+#     x_values = np.linspace(min(subject[1]["raw_marks"]), max(subject[1]["raw_marks"]), 100)
+#     y_values = subject[1]["polynomial"](x_values)
+#     plt.plot(x_values, y_values, label="Regression Line")
+#     plt.plot(subject[1]["raw_marks"], subject[1]["aligned_marks"], "o", label="Data points")
+#     plt.title(f"Raw Marks vs Aligned Marks for {subject[0]}")
+#     plt.xlabel("Raw Marks")
+#     plt.ylabel("Aligned Marks")
+#     plt.legend()
+#     plt.show()
 
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)
