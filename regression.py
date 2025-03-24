@@ -3,8 +3,10 @@ import numpy as np
 import json
 import os
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 current_directory = os.path.dirname(__file__)
 data_directory = os.path.join(current_directory, 'data')
@@ -103,10 +105,11 @@ def determine_band(mark):
     else:
         return "Band 1"
 
-@app.route('/predict', methods=['GET'])
+@app.route('/predict', methods=['POST'])
 def predict():
-    subject_name = request.args.get('subject')
-    raw_mark = request.args.get('raw_mark', type=float)
+    data = request.get_json()
+    subject_name = data.get('subject')
+    raw_mark = data.get('rawMark')
 
     if not subject_name or raw_mark is None:
         return jsonify({'error': 'Missing subject name or raw mark'}), 400

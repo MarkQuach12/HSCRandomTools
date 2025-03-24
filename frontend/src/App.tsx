@@ -15,8 +15,33 @@ import { Button } from "@/components/ui/button"
 function App() {
   const [subject, setSubject] = useState("")
   const [rawMark, setRawMark] = useState("")
-  const [predictedMark, setPredictedMark] = useState(null)
-  const [band, setBand] = useState("Not Available")
+  const [predictions, setPredictions] = useState([])
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject: subject,
+          rawMark: parseFloat(rawMark),
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setPredictions(data.predictions)
+      } else {
+        throw new Error(data.message)
+      }
+    } catch (error) {
+      console.error(error)
+      alert(error.message)
+    }
+  }
 
   return (
     <>
@@ -41,7 +66,20 @@ function App() {
           min={0}
           max={100}
         />
-        <Button className='w-full mt-4' variant="outline">Predict Scaled Mark</Button>
+        <Button className='w-full mt-4' variant="outline" onClick={handleSubmit}>Predict Scaled Mark</Button>
+
+        {predictions.length > 0 && (
+          <div className = 'mt-6'>
+            <h3 classname = 'text-lg font-semibold mb-2'> Predictions</h3>
+            <ul className = 'space-y-1'>
+              {predictions.map((item, index) => (
+                <li key='index'>
+                  {item.year} : <strong>{item.predicted_mark}</strong>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         </CardContent>
         </Card>
       </div>
