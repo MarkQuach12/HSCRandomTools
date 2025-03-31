@@ -8,12 +8,45 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 // Define the prediction item shape
 type Prediction = {
   year: number
   predicted_mark: number
 }
+
+const subjects = [
+  {
+    label: "Mathematics",
+    items: [
+      "Mathematics Standard",
+      "Mathematics Advanced",
+      "Mathematics Extension 1",
+      "Mathematics Extension 2",
+    ],
+  },
+  {
+    label: "English",
+    items: ["English Advanced"],
+  },
+  {
+    label: "Science",
+    items: ["Biology", "Chemistry", "Physics"],
+  },
+  {
+    label: "HSIE",
+    items: ["Business Studies", "Economics", "Modern History"],
+  },
+]
 
 function App() {
   const [subject, setSubject] = useState("")
@@ -58,12 +91,23 @@ function App() {
           <CardTitle className="text-2xl font-bold">HSC Scaled Mark Predictor</CardTitle>
         </CardHeader>
         <CardContent>
-          <Input
-            placeholder='Enter Subject'
-            className='mt-4'
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-          />
+        <Select onValueChange={setSubject} value={subject}>
+          <SelectTrigger className="w-[280px]">
+           <SelectValue placeholder="Select a subject" />
+          </SelectTrigger>
+          <SelectContent>
+            {subjects.map((group) => (
+              <SelectGroup key={group.label}>
+                <SelectLabel className="font-semibold">{group.label}</SelectLabel>
+                {group.items.map((subject) => (
+                  <SelectItem key={subject} value={subject}>
+                    {subject}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            ))}
+          </SelectContent>
+        </Select>
           <Input
             type='number'
             placeholder='Enter Raw Mark'
