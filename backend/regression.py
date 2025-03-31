@@ -15,41 +15,52 @@ file_path = os.path.join(data_directory, 'raw_marks.json')
 with open(file_path, 'r') as file:
     subjects = json.load(file)
 
-def is_monotonically_increasing(polynomial, x_values):
-    derivative = np.polyder(polynomial)
-    derivative_values = derivative(x_values)
-    return np.all(derivative_values >= 0)
+def is_monotonically_increasing(func, x_min=0, x_max=100, step=0.1, tolerance=1e-6):
+    x_vals = np.arange(x_min, x_max + step, step)
+    y_vals = func(x_vals)
+    diffs = np.diff(y_vals)
+    return np.all(diffs >= -tolerance)
+
 
 def calculate_bic(y, y_pred, p):
     n = len(y)
     residual_sum_of_squares = np.sum((y - y_pred) ** 2)
     return n * np.log(residual_sum_of_squares / n) + p * np.log(n)
 
-def polynomials(subject):
+import numpy as np
+
+def constrained_polynomials(subject, max_degree=5):
     min_bic = float('inf')
-    best_polynomial = None
+    best_poly = None
 
-    for degree in range(1, 6):
-        if len(subject['raw_marks']) >= degree + 1:
-            coefficients = np.polyfit(subject['raw_marks'], subject["aligned_marks"], degree)
-            polynomial = np.poly1d(coefficients)
+    x = np.array(subject['raw_marks'])
+    y = np.array(subject['aligned_marks'])
 
-            if not is_monotonically_increasing(polynomial, subject['raw_marks']):
+    for degree in range(1, max_degree + 1):
+        if len(x) >= degree + 1:
+            coeffs = np.polyfit(x, y, degree)
+            poly = np.poly1d(coeffs)
+
+            # Scale the whole polynomial so that f(100) = 100
+            scale = 100 / poly(100)
+            scaled_poly = np.poly1d(poly.coefficients * scale)
+
+            if not is_monotonically_increasing(scaled_poly):
                 continue
 
-            y_pred = polynomial(subject['raw_marks'])
-            bic = calculate_bic(np.array(subject["aligned_marks"]), y_pred, degree + 1)
+            y_pred = scaled_poly(x)
+            bic = calculate_bic(y, y_pred, degree + 1)
 
             if bic < min_bic:
                 min_bic = bic
-                best_polynomial = polynomial
+                best_poly = scaled_poly
 
-    return best_polynomial
+    return best_poly
 
 for subject_name, years_data in subjects.items():
     for year, marks in years_data.items():
         if len(marks["raw_marks"]) >= 5:
-            polynomial = polynomials(marks)
+            polynomial = constrained_polynomials(marks)
             marks["polynomial"] = polynomial
 
 def main():
