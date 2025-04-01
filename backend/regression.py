@@ -15,6 +15,7 @@ file_path = os.path.join(data_directory, 'raw_marks.json')
 with open(file_path, 'r') as file:
     subjects = json.load(file)
 
+
 def is_monotonically_increasing(func, x_min=0, x_max=100, step=0.1, tolerance=1e-6):
     x_vals = np.arange(x_min, x_max + step, step)
     y_vals = func(x_vals)
@@ -139,6 +140,25 @@ def predict():
             predictions.append({'year': years, 'predicted_mark': round(predicted_mark, 2)})
 
     return jsonify({'predictions': predictions})
+
+file_path_band6 = os.path.join(data_directory, 'band6Marks.json')
+with open(file_path_band6, 'r', encoding='utf-8') as f:
+    band6_data = json.load(f)
+
+@app.route('/band6', methods=['POST'])
+def get_band6():
+    data = request.get_json()
+    school_name = data.get('school')
+
+    if not school_name:
+        return jsonify({'error': 'Missing school name'}), 400
+
+    school_data = band6_data.get(school_name)
+
+    if not school_data:
+        return jsonify({'error': 'School not found'}), 404
+
+    return jsonify({'school_data': school_data})
 
 # def plot_subject(subject):
 #     x_values = np.linspace(min(subject[1]["raw_marks"]), max(subject[1]["raw_marks"]), 100)
