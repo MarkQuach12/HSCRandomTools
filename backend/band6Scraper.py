@@ -83,14 +83,23 @@ for letter in string.ascii_uppercase:
                 band6Count[school][subject] = {
                     y : 0 for y in range(2024, 2019, -1)
                 }
+                band6Count[school][subject][year] = 1
             else:
                 band6Count[school][subject][year] += 1
+
+sorted_band6Count = {}
+
+for school in sorted(band6Count.keys()):
+    sorted_band6Count[school] = {}
+    for subject in sorted(band6Count[school].keys()):
+        sorted_band6Count[school][subject] = band6Count[school][subject]
+
 
 current_directory = os.path.dirname(__file__)
 data_directory = os.path.join(current_directory, 'data')
 file_path = os.path.join(data_directory, 'band6Marks.json')
 
 with open(file_path, 'w', encoding='utf-8') as f:
-    json.dump(band6Count, f, indent=2, ensure_ascii=False)
+    json.dump(sorted_band6Count, f, indent=2, ensure_ascii=False)
 
 print("Done")
