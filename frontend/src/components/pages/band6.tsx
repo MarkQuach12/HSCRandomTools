@@ -34,7 +34,9 @@ function Band6() {
         const sampleSubject = Object.values(raw)[0];
         const yearKeys = Object.keys(sampleSubject);
 
-        setYears(yearKeys.reverse())
+        const reversedYears = [...yearKeys].reverse(); // make a copy before reversing
+        setYears(reversedYears);
+
 
         const transformed = Object.entries(raw).map(([subject, yearData]: any) => ({
             subject, ...yearData,

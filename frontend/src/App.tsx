@@ -1,6 +1,6 @@
 import "./App.css";
 import Predict from "./components/pages/Predict";
-import Band6 from "./components/pages/Band6";
+import Band6 from "./components/pages/band6";
 import Navbar from "./components/pages/Navbar";
 import { Routes, Route } from "react-router-dom";
 
