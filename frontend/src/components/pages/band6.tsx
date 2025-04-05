@@ -31,7 +31,7 @@ function Band6() {
       if (response.ok) {
         const raw = data.school_data;
 
-        const sampleSubject = Object.values(raw)[0];
+        const sampleSubject = Object.values(raw)[0] as Record<string, number>;
         const yearKeys = Object.keys(sampleSubject);
 
         const reversedYears = [...yearKeys].reverse(); // make a copy before reversing
