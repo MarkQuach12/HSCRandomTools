@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import './App.css'
 import Predict from './components/pages/Predict'
 import Band6 from './components/pages/Band6'
