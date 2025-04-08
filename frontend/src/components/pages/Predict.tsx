@@ -107,16 +107,21 @@ function Predict() {
             ))}
           </SelectContent>
         </Select>
-          <Input
-            type='number'
-            placeholder='Enter Raw Mark'
-            className='mt-2'
-            value={rawMark}
-            onChange={(e) => setRawMark(e.target.value)}
-            min={0}
-            max={100}
-          />
-          <Button className='w-full mt-4' variant="outline" onClick={handleSubmit}>Predict Scaled Mark</Button>
+          <form onSubmit={(e) => {
+            e.preventDefault()
+            handleSubmit()
+          }}>
+            <Input
+              type='number'
+              placeholder='Enter Raw Mark'
+              className='mt-2'
+              value={rawMark}
+              onChange={(e) => setRawMark(e.target.value)}
+              min={0}
+              max={100}
+            />
+            <Button className='w-full mt-4' variant="outline" onClick={handleSubmit}>Predict Scaled Mark</Button>
+          </form>
 
           {predictions.length > 0 && (
             <div className='mt-6'>
