@@ -13,17 +13,17 @@ function Navbar() {
           <NavigationMenuList className="flex space-x-4">
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/" className="!text-black">Home</Link>
+                <Link to="/" className="!text-black !text-base">Home</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/predict" className="!text-black">Predict</Link>
+                <Link to="/predict" className="!text-black !text-base">Scaled Mark Predictor</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link to="/band6" className="!text-black">Band 6</Link>
+                <Link to="/band6" className="!text-black !text-base">Band 6 List</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
