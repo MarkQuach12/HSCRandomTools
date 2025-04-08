@@ -3,13 +3,14 @@ import Predict from "./components/pages/Predict";
 import Band6 from "./components/pages/band6";
 import Navbar from "./components/pages/Navbar";
 import { Routes, Route } from "react-router-dom";
+import Home from "./components/pages/Home";
 
 function App() {
   return (
     <div className="pt-20 px-4">
       <Navbar />
       <Routes>
-        <Route path="/"/>
+        <Route path="/" element={<Home />}/>
         <Route path="/predict" element={<Predict />} />
         <Route path="/band6" element={<Band6 />} />
       </Routes>
