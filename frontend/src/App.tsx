@@ -4,6 +4,7 @@ import Band6 from "./components/pages/band6";
 import Navbar from "./components/pages/Navbar";
 import { Routes, Route } from "react-router-dom";
 import Home from "./components/pages/Home";
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/predict" element={<Predict />} />
         <Route path="/band6" element={<Band6 />} />
       </Routes>
+      <Analytics />
     </div>
   );
 }
