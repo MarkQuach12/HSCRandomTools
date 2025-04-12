@@ -160,6 +160,15 @@ def get_band6():
 
     return jsonify({'school_data': school_data})
 
+@app.route('/band6/schools', methods=['GET'])
+def schools():
+    schools = list(band6_data.keys())
+
+    if not schools:
+        return jsonify({'error': 'Schools list not found'}), 404
+
+    return jsonify({'schools': schools})
+
 # def plot_subject(subject):
 #     x_values = np.linspace(min(subject[1]["raw_marks"]), max(subject[1]["raw_marks"]), 100)
 #     y_values = subject[1]["polynomial"](x_values)

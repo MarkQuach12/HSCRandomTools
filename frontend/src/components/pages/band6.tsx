@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
 Table,
 TableBody,
@@ -15,6 +15,26 @@ function Band6() {
 const [school, setSchool] = useState('');
 const [subjectData, setSubjectData] = useState<any[]>([]);
 const [years, setYears] = useState<string[]>([]);
+const [allSchools, setAllSchools] = useState<string[]>([])
+const [filteredSchools, setFilteredSchools] = useState<string[]>([])
+const [showDropdown, setShowDropdown] = useState(false)
+
+useEffect(() => {
+    const fetchSchools = async () => {
+        const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/band6/schools`);
+        console.log(response)
+        const data = await response.json();
+        setAllSchools(data.schools);
+        console.log("Fetched schools:", data.schools);
+    }
+    fetchSchools();
+}, [])
+
+const handleSelectSchool = (selectedSchool: string) => {
+    setSchool(selectedSchool);
+    setFilteredSchools([]);
+    setShowDropdown(false);
+}
 
 const handleSubmit = async () => {
     try {
@@ -63,19 +83,46 @@ return (
     <h2 className="text-3xl font-semibold">Band 6 List</h2>
 
     <div className="flex w-full items-center space-x-2">
-        <form onSubmit={(e) => {
+        <form
+            onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
-        }} className="flex w-full items-center space-x-2">
-            <Input
-                value={school}
-                onChange={(e) => setSchool(e.target.value)}
-                placeholder="Enter School Name"
-            />
-            <Button onClick={handleSubmit} className="text-black">
-            Search
-            </Button>
-        </form>
+            }}
+        className="flex w-full items-center space-x-2">
+        <div className="relative w-full">
+        <Input
+            value={school}
+            onChange={(e) => {
+                const input = e.target.value;
+                setSchool(input);
+                const filtered = allSchools.filter((s) =>
+                    s.toLowerCase().startsWith(input.toLowerCase())
+                );
+                setFilteredSchools(filtered);
+                setShowDropdown(input.length > 0 && filtered.length > 0);
+            }}
+            placeholder="Enter School Name"
+        />
+        {showDropdown && (
+            <ul className="absolute z-50 bg-white border rounded w-full max-h-60 overflow-auto shadow">
+            {filteredSchools.map((s, index) => (
+                <li
+                    key={index}
+                    onClick={() => handleSelectSchool(s)}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                >
+                {s}
+                </li>
+            ))}
+            </ul>
+        )}
+        </div>
+
+    <Button type="submit" className="text-black">
+        Search
+    </Button>
+    </form>
+
     </div>
 
     {subjectData.length > 0 && (
