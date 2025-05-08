@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 
 function Navbar() {
     return (
-      <div className="fixed top-0 left-0 w-full bg-white border-b shadow p-4">
+      <div className="fixed top-0 left-0 w-full bg-white border-b shadow p-4 z-50">
         <NavigationMenu>
           <NavigationMenuList className="flex space-x-4">
             <NavigationMenuItem>
