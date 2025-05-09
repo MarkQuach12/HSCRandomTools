@@ -5,7 +5,6 @@ import {
     NavigationMenuList,
   } from "@/components/ui/navigation-menu"
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import Timer from '../timer';
 
 function Navbar() {
