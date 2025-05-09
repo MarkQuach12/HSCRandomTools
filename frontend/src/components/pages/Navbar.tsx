@@ -5,10 +5,12 @@ import {
     NavigationMenuList,
   } from "@/components/ui/navigation-menu"
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import Timer from '../timer';
 
 function Navbar() {
     return (
-      <div className="fixed top-0 left-0 w-full bg-white border-b shadow p-4 z-50">
+      <div className="flex justify-between items-center fixed top-0 left-0 w-full bg-white border-b shadow p-4 z-50">
         <NavigationMenu>
           <NavigationMenuList className="flex space-x-4">
             <NavigationMenuItem>
@@ -27,7 +29,8 @@ function Navbar() {
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
-        </NavigationMenu>
+          </NavigationMenu>
+          <Timer />
       </div>
     );
   }
