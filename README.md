@@ -7,6 +7,7 @@ HSC Random Tools is a personal project I built to help NSW HSC students better u
 Current features:
 * Scaled Mark Predictor
 * Band 6 School List
+* Countdown to HSC English Paper 1
 * More Coming Soon!
 
 ## 🔧 Built With
