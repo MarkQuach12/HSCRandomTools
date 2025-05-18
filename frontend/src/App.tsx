@@ -5,6 +5,8 @@ import Navbar from "./components/pages/Navbar";
 import { Routes, Route } from "react-router-dom";
 import Home from "./components/pages/Home";
 import { Analytics } from "@vercel/analytics/react"
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -16,6 +18,9 @@ function App() {
         <Route path="/band6" element={<Band6 />} />
       </Routes>
       <Analytics />
+      <ToastContainer
+        pauseOnFocusLoss={false}
+      />
     </div>
   );
 }
