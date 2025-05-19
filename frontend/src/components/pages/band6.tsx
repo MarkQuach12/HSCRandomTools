@@ -53,6 +53,10 @@ function Band6() {
             return;
         }
 
+        if (school === displaySchool) {
+            return;
+        }
+
         try {
         const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/band6`, {
             method: 'POST',
