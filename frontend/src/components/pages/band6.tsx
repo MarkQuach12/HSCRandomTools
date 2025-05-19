@@ -23,7 +23,7 @@ function Band6() {
 
     useEffect(() => {
         const fetchSchools = async () => {
-            const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/band6/schools`);
+            const response = await fetch(`${import.meta.env.BACKEND_URL}/band6/schools`);
             console.log(response)
             const data = await response.json();
             setAllSchools(data.schools);
@@ -54,7 +54,7 @@ function Band6() {
         }
 
         try {
-        const response = await fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_URL}/band6`, {
+        const response = await fetch(`${import.meta.env.BACKEND_URL}/band6`, {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',

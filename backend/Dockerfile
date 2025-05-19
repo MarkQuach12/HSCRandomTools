@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["python", "regression.py"]
+CMD ["python", "app.py"]

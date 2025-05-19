@@ -60,7 +60,7 @@ function Predict() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_REACT_APP_BACKEND_URL}/predict`,
+        `${import.meta.env.BACKEND_URL}/predict`,
         {
           method: "POST",
           headers: {
