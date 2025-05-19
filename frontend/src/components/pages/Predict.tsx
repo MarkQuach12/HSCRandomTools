@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 type Prediction = {
   year: number;
@@ -48,15 +48,15 @@ function Predict() {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
 
   const handleSubmit = async () => {
-    // if (parseFloat(rawMark) < 0 || parseFloat(rawMark) > 100) {
-    //   toast.error("Please enter a valid raw mark between 0 and 100", {
-    //     position: "bottom-right",
-    //     autoClose: 4000,
-    //     hideProgressBar: false,
-    //     theme: "colored",
-    //   });
-    //   return;
-    // }
+    if (parseFloat(rawMark) < 0 || parseFloat(rawMark) > 100) {
+      toast.error("Please enter a valid raw mark between 0 and 100", {
+        position: "bottom-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        theme: "colored",
+      });
+      return;
+    }
 
     try {
       const response = await fetch(
@@ -131,13 +131,10 @@ function Predict() {
               className="mt-2"
               value={rawMark}
               onChange={(e) => setRawMark(e.target.value)}
-              min={0}
-              max={100}
             />
             <Button
               className="w-full mt-4"
               variant="outline"
-              onClick={handleSubmit}
             >
               Predict Scaled Mark
             </Button>

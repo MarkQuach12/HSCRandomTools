@@ -14,6 +14,7 @@ import { toast } from 'react-toastify';
 
 function Band6() {
     const [school, setSchool] = useState('');
+    const [displaySchool, setDisplaySchool] = useState('');
     const [subjectData, setSubjectData] = useState<any[]>([]);
     const [years, setYears] = useState<string[]>([]);
     const [allSchools, setAllSchools] = useState<string[]>([])
@@ -77,7 +78,7 @@ function Band6() {
             }));
 
             setSubjectData(transformed);
-
+            setDisplaySchool(school);
         } else {
             throw new Error(data.message);
         }
@@ -138,10 +139,9 @@ function Band6() {
         </form>
 
         </div>
-
         {subjectData.length > 0 && (
             <Table>
-            <TableCaption>Band 6 predictions for {school}</TableCaption>
+            <TableCaption>Band 6 predictions for {displaySchool}</TableCaption>
             <TableHeader>
             <TableRow>
                 <TableHead >Subject</TableHead>
