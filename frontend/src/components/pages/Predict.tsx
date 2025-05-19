@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 type Prediction = {
   year: number;
@@ -60,7 +60,7 @@ function Predict() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.BACKEND_URL}/predict`,
+        `${import.meta.env.VITE_BACKEND_URL}/predict`,
         {
           method: "POST",
           headers: {
@@ -132,10 +132,7 @@ function Predict() {
               value={rawMark}
               onChange={(e) => setRawMark(e.target.value)}
             />
-            <Button
-              className="w-full mt-4"
-              variant="outline"
-            >
+            <Button className="w-full mt-4" variant="outline">
               Predict Scaled Mark
             </Button>
           </form>
