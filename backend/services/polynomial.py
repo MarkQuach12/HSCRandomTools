@@ -1,6 +1,6 @@
 import numpy as np
-import json
-import os
+from supabase_client.client import supabase
+from collections import defaultdict
 
 def is_monotonically_increasing(func, x_min=0, x_max=100, step=0.1, tolerance=1e-6):
     x_vals = np.arange(x_min, x_max + step, step)
@@ -41,19 +41,33 @@ def constrained_polynomials(subject, max_degree=5):
 
     return best_poly
 
-def load_subjects():
-    current_directory = os.path.dirname(__file__)
-    data_directory = os.path.join(current_directory, '..' ,'data')
-    file_path = os.path.join(data_directory, 'raw_marks.json')
+def load_subjects(subject):
+    response = supabase.table("Raw Mark Polynomials").select("*").eq("subject", subject).execute()
+    rows = response.data
 
-    with open(file_path, 'r') as file:
-        subjects_polynomial = json.load(file)
+    subject_polynomial = {}
 
-    for subject_name, years_data in subjects_polynomial.items():
+    for row in rows:
+        subject_name = row['subject']
+        year = row['year']
+        raw_mark = row['raw_mark']
+        aligned_mark = row['aligned_mark']
+
+        if subject_name not in subject_polynomial:
+            subject_polynomial[subject_name] = {}
+        if year not in subject_polynomial[subject_name]:
+            subject_polynomial[subject_name][year] = {
+                "raw_marks": [],
+                "aligned_marks": [],
+                "polynomial": None
+            }
+
+        subject_polynomial[subject_name][year]["raw_marks"].append(raw_mark)
+        subject_polynomial[subject_name][year]["aligned_marks"].append(aligned_mark)
+
+    for subject_name, years_data in subject_polynomial.items():
         for year, marks in years_data.items():
             if len(marks["raw_marks"]) >= 5:
                 polynomial = constrained_polynomials(marks)
                 marks["polynomial"] = polynomial
-    return subjects_polynomial
-
-subjects_polynomial = load_subjects()
+    return subject_polynomial

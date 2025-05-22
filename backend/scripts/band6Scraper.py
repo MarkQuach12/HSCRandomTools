@@ -96,7 +96,7 @@ for school in sorted(band6Count.keys()):
 
 
 current_directory = os.path.dirname(__file__)
-data_directory = os.path.join(current_directory, 'data')
+data_directory = os.path.join(current_directory, '..' , 'data')
 file_path = os.path.join(data_directory, 'band6Marks.json')
 
 with open(file_path, 'w', encoding='utf-8') as f:
