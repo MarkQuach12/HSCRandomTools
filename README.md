@@ -19,6 +19,7 @@ Current features:
 * [![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 * [![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 * [![Fly.io](https://img.shields.io/badge/Fly.io-000000?style=for-the-badge&logo=flydotio&logoColor=white)](https://fly.io/)
+* [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
 
 ## 🚀 Get Started
 
