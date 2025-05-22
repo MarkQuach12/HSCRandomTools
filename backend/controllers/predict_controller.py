@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from services.polynomial import subjects_polynomial
+from services.polynomial import load_subjects
 
 predict_bp = Blueprint('predict', __name__)
 
@@ -12,7 +12,9 @@ def predict():
     if not subject_name or raw_mark is None:
         return jsonify({'error': 'Missing subject name or raw mark'}), 400
 
-    subject = subjects_polynomial.get(subject_name)
+    subject = load_subjects(subject_name).get(subject_name)
+
+    print(subject)
 
     if not subject:
         return jsonify({'error': 'Subject not found'}), 404
