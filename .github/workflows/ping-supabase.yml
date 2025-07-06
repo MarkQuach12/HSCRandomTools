@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Supabase Every 10 Minutes
-        run: curl -s https://wybcwemfurgvmwdvtyjj.supabase.co
+        run: curl -s https://wybcwemfurgvmwdvtyjj.supabase.co/rest/v1/health
