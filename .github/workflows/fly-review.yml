@@ -34,4 +34,4 @@ jobs:
         uses: superfly/fly-pr-review-apps@1.2.1
         with:
           path: ./backend
-          name: pr-${{ github.event.number }}-${{ toLower(github.actor) }}-hscrandomtools
+          name: pr-${{ github.event.number }}-hscrandomtools
