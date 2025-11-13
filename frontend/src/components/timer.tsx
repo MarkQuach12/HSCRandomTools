@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 function Timer() {
     const updateTimer = () => {
         const now = new Date();
-        const finalDate = new Date("October 16, 2025 09:50:00");
+        const finalDate = new Date("October 16, 2026 09:50:00");
 
         const difference = finalDate.getTime() - now.getTime();
         const days = Math.floor(difference / (1000 * 3600 * 24));
