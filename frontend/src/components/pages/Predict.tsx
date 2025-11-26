@@ -132,7 +132,7 @@ function Predict() {
               value={rawMark}
               onChange={(e) => setRawMark(e.target.value)}
             />
-            <Button className="w-full mt-4" variant="outline">
+            <Button className="w-full mt-4 bg-white" variant="outline">
               Predict Scaled Mark
             </Button>
           </form>
