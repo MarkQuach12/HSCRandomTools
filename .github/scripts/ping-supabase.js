@@ -1,10 +1,17 @@
 const { createClient } = require("@supabase/supabase-js");
 
 async function ping() {
-  const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_KEY
-  );
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_KEY;
+
+  console.log("SUPABASE_URL defined:", !!url);
+  console.log("SUPABASE_KEY defined:", !!key);
+
+  if (!url || !key) {
+    throw new Error("Missing SUPABASE_URL or SUPABASE_KEY environment variables");
+  }
+
+  const supabase = createClient(url, key);
 
   const { data, error } = await supabase
     .from("Band 6 Data")
@@ -17,6 +24,9 @@ async function ping() {
 }
 
 ping().catch((err) => {
-  console.error("Error pinging Supabase:", err.message);
+  console.error("Error pinging Supabase:", err);
+  if (err.cause) {
+    console.error("Cause:", err.cause);
+  }
   process.exit(1);
 });
